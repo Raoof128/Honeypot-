@@ -1,0 +1,53 @@
+# Python dependencies for threat intelligence analysis scripts
+
+# Elasticsearch client
+elasticsearch==8.11.0
+
+# GeoIP lookups
+geoip2==4.7.0
+
+# Data processing
+pandas==2.1.4
+numpy==1.26.2
+
+# Date/time handling
+python-dateutil==2.8.2
+
+# HTTP requests (for API calls)
+requests==2.31.0
+
+# JSON processing (included in standard library, but listing for clarity)
+# json - standard library
+
+# STIX 2.1 support
+stix2==3.0.1
+
+# MISP integration (optional)
+pymisp==2.4.179
+
+# Testing
+pytest==7.4.3
+pytest-cov==4.1.0
+
+# Code quality
+pylint==3.0.3
+black==23.12.1
+flake8==7.0.0
+
+# Logging
+coloredlogs==15.0.1
+
+# CLI argument parsing (standard library, but listing)
+# argparse - standard library
+
+# UUID generation (standard library)
+# uuid - standard library
+
+# CSV handling (standard library)
+# csv - standard library
+
+# Regular expressions (standard library)
+# re - standard library
+
+# Collections (standard library)
+# collections - standard library
