@@ -1,0 +1,319 @@
+# Dionaea Multi-Protocol Honeypot Configuration
+# Captures exploits and malware across HTTP, FTP, SMTP, MySQL, SMB, SIP
+# Version: 0.11.0
+
+# ==========================================
+# Global Settings
+# ==========================================
+dionaea:
+  download:
+    # Directory for downloaded malware samples
+    dir: /opt/dionaea/var/dionaea/binaries
+    # Maximum file size (100MB)
+    max-size: 104857600
+
+  submit:
+    # Submit to VirusTotal (optional)
+    virustotal:
+      enabled: false
+      # API key required
+      # api-key: YOUR_VT_API_KEY
+
+  logging:
+    # Log directory
+    logdir: /var/log/dionaea
+    # Log levels: debug, info, warning, error
+    level: info
+
+# ==========================================
+# Module Configuration
+# ==========================================
+modules:
+  # ==========================================
+  # HTTP/HTTPS Module
+  # ==========================================
+  http:
+    enabled: true
+    port: 80
+    ssl:
+      enabled: true
+      port: 443
+      # Self-signed certificate
+      cert: /opt/dionaea/etc/dionaea/ssl/dionaea.crt
+      key: /opt/dionaea/etc/dionaea/ssl/dionaea.key
+
+    # Server header
+    server: Apache/2.4.41 (Ubuntu)
+
+    # Document root (fake web server)
+    root: /opt/dionaea/var/dionaea/wwwroot
+
+    # Common vulnerable paths to emulate
+    paths:
+      - /admin
+      - /phpmyadmin
+      - /wp-admin
+      - /wp-login.php
+      - /administrator
+      - /cgi-bin/php
+      - /cgi-bin/test.cgi
+      - /.git/config
+      - /.env
+      - /api/
+      - /shell.php
+      - /c99.php
+
+  # ==========================================
+  # FTP Module
+  # ==========================================
+  ftp:
+    enabled: true
+    port: 21
+
+    # FTP banner
+    banner: ProFTPD 1.3.5 Server
+
+    # Anonymous login
+    anonymous: true
+
+    # Root directory
+    root: /opt/dionaea/var/dionaea/ftproot
+
+    # Maximum connections
+    max-connections: 50
+
+  # ==========================================
+  # MySQL Module
+  # ==========================================
+  mysql:
+    enabled: true
+    port: 3306
+
+    # Server version
+    version: 5.7.35-0ubuntu0.18.04.2
+
+    # Weak credentials
+    users:
+      root:
+        password: root
+      admin:
+        password: admin
+      mysql:
+        password: mysql
+      test:
+        password: test
+
+  # ==========================================
+  # MSSQL Module
+  # ==========================================
+  mssql:
+    enabled: true
+    port: 1433
+
+    # Server version
+    version: Microsoft SQL Server 2019
+
+    # Weak credentials
+    users:
+      sa:
+        password: password
+      admin:
+        password: admin123
+
+  # ==========================================
+  # SMB Module
+  # ==========================================
+  smb:
+    enabled: true
+    port: 445
+
+    # NetBIOS name
+    netbios-name: WEB-SERVER-01
+
+    # Workgroup
+    workgroup: WORKGROUP
+
+    # Server type
+    server-type: Windows Server 2019
+
+    # Shares
+    shares:
+      C$:
+        path: /opt/dionaea/var/dionaea/smbshares/C
+        readonly: false
+      ADMIN$:
+        path: /opt/dionaea/var/dionaea/smbshares/admin
+        readonly: false
+      IPC$:
+        path: /opt/dionaea/var/dionaea/smbshares/ipc
+        readonly: true
+
+  # ==========================================
+  # SMTP Module
+  # ==========================================
+  smtp:
+    enabled: true
+    port: 25
+
+    # SMTP banner
+    banner: mail.example.com ESMTP Postfix (Ubuntu)
+
+    # Accepted domains
+    domains:
+      - example.com
+      - localhost
+
+  # ==========================================
+  # SIP Module (VoIP)
+  # ==========================================
+  sip:
+    enabled: true
+    port: 5060
+    protocol: udp
+
+    # SIP domain
+    domain: voip.example.com
+
+    # User agent
+    user-agent: Asterisk PBX 16.2.1
+
+  # ==========================================
+  # TFTP Module
+  # ==========================================
+  tftp:
+    enabled: true
+    port: 69
+    protocol: udp
+
+    # TFTP root
+    root: /opt/dionaea/var/dionaea/tftproot
+
+  # ==========================================
+  # UPNP Module
+  # ==========================================
+  upnp:
+    enabled: true
+    port: 1900
+    protocol: udp
+
+# ==========================================
+# Processors (Post-Processing)
+# ==========================================
+processors:
+  # ==========================================
+  # VirusTotal Submission
+  # ==========================================
+  virustotal:
+    enabled: false
+    # Requires API key
+    # api-key: YOUR_API_KEY
+    # Rate limit (requests per minute)
+    rate-limit: 4
+
+  # ==========================================
+  # Malware Hash Calculation
+  # ==========================================
+  hash:
+    enabled: true
+    algorithms:
+      - md5
+      - sha1
+      - sha256
+
+  # ==========================================
+  # PCAP Capture
+  # ==========================================
+  pcap:
+    enabled: true
+    output: /var/log/dionaea/pcap
+
+# ==========================================
+# Outputs (Logging)
+# ==========================================
+outputs:
+  # ==========================================
+  # JSON Logging
+  # ==========================================
+  jsonlog:
+    enabled: true
+    filename: /var/log/dionaea/dionaea.json
+
+  # ==========================================
+  # SQLite Database
+  # ==========================================
+  sqlite:
+    enabled: true
+    database: /var/log/dionaea/dionaea.sqlite
+
+  # ==========================================
+  # Elasticsearch (Optional)
+  # ==========================================
+  elasticsearch:
+    enabled: false
+    host: elasticsearch
+    port: 9200
+    index: dionaea
+
+  # ==========================================
+  # Syslog
+  # ==========================================
+  syslog:
+    enabled: false
+    facility: local0
+
+# ==========================================
+# Security & Rate Limiting
+# ==========================================
+security:
+  # Maximum connections per IP
+  max-connections-per-ip: 10
+
+  # Ban duration (seconds) after limit
+  ban-duration: 300
+
+  # Blacklist IPs (optional)
+  blacklist:
+    enabled: false
+    ips: []
+
+  # Whitelist IPs (never ban)
+  whitelist:
+    enabled: false
+    ips:
+      - 127.0.0.1
+
+# ==========================================
+# DEPLOYMENT NOTES
+# ==========================================
+# 1. Expected Attack Patterns:
+#    - Automated vulnerability scanners (Nmap, Nessus, Qualys)
+#    - Botnet command & control beacons
+#    - Credential stuffing on MySQL/MSSQL
+#    - SMB exploitation attempts (EternalBlue, etc.)
+#    - Web shell uploads via HTTP
+#    - Spam relay attempts on SMTP
+#
+# 2. MITRE ATT&CK Techniques Observed:
+#    - T1190: Exploit Public-Facing Application (HTTP, FTP)
+#    - T1021.002: SMB/Windows Admin Shares
+#    - T1110: Brute Force (MySQL, MSSQL)
+#    - T1071: Application Layer Protocol (HTTP, SMTP)
+#    - T1105: Ingress Tool Transfer (file downloads)
+#
+# 3. Malware Families Commonly Seen:
+#    - Mirai botnet variants
+#    - Cryptocurrency miners (XMRig)
+#    - Ransomware payloads
+#    - Web shells (C99, r57)
+#    - DDoS tools
+#
+# 4. Maintenance:
+#    - Check /opt/dionaea/var/dionaea/binaries daily for malware
+#    - Scan downloads with ClamAV or VirusTotal
+#    - Rotate logs weekly
+#    - Monitor disk usage (malware can fill disk)
+#
+# 5. Integration:
+#    - Logs automatically parsed by Logstash
+#    - Malware hashes extracted to IOC feed
+#    - GeoIP enrichment in ELK pipeline

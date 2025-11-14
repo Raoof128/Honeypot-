@@ -1,0 +1,308 @@
+version: '3.8'
+
+# T-Pot Honeypot Infrastructure with ELK Stack
+# Production-grade multi-service honeypot for threat intelligence collection
+
+networks:
+  honeypot_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+
+  elk_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/24
+
+volumes:
+  elasticsearch_data:
+    driver: local
+  cowrie_logs:
+    driver: local
+  cowrie_downloads:
+    driver: local
+  dionaea_logs:
+    driver: local
+  dionaea_binaries:
+    driver: local
+  suricata_logs:
+    driver: local
+  logstash_pipeline:
+    driver: local
+  kibana_data:
+    driver: local
+
+services:
+  # ==========================================
+  # ELASTICSEARCH - Log Storage & Indexing
+  # ==========================================
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
+    container_name: elasticsearch
+    environment:
+      - node.name=elasticsearch
+      - cluster.name=honeypot-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+      - xpack.security.enabled=false
+      - xpack.security.http.ssl.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    mem_limit: 4g
+    cpus: 2.0
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - elk_net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # ==========================================
+  # LOGSTASH - Log Parsing & Enrichment
+  # ==========================================
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.11.1
+    container_name: logstash
+    environment:
+      - "LS_JAVA_OPTS=-Xms1g -Xmx1g"
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    mem_limit: 2g
+    cpus: 1.5
+    volumes:
+      - ./elk-stack/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+      - ./elk-stack/geoip:/usr/share/logstash/geoip:ro
+      - cowrie_logs:/var/log/cowrie:ro
+      - dionaea_logs:/var/log/dionaea:ro
+      - suricata_logs:/var/log/suricata:ro
+    ports:
+      - "5044:5044"
+      - "9600:9600"
+    networks:
+      - elk_net
+      - honeypot_net
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9600/_node/stats || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # ==========================================
+  # KIBANA - Visualization & Dashboards
+  # ==========================================
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.1
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - SERVER_NAME=honeypot-kibana
+      - SERVER_HOST=0.0.0.0
+    mem_limit: 2g
+    cpus: 1.0
+    volumes:
+      - kibana_data:/usr/share/kibana/data
+    ports:
+      - "5601:5601"
+    networks:
+      - elk_net
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5601/api/status || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # ==========================================
+  # COWRIE - SSH/Telnet Honeypot
+  # ==========================================
+  cowrie:
+    image: cowrie/cowrie:latest
+    container_name: cowrie
+    hostname: srv-prod-01
+    environment:
+      - COWRIE_BACKEND_LOG_FILE=/var/log/cowrie/cowrie.json
+      - COWRIE_OUTPUT_JSONLOG_ENABLED=true
+      - COWRIE_DOWNLOAD_PATH=/var/lib/cowrie/downloads
+    mem_limit: 1g
+    cpus: 1.0
+    volumes:
+      - ./t-pot/cowrie_config.cfg:/cowrie/cowrie-git/etc/cowrie.cfg:ro
+      - cowrie_logs:/var/log/cowrie
+      - cowrie_downloads:/var/lib/cowrie/downloads
+    ports:
+      - "2222:2222/tcp"   # SSH honeypot
+      - "2223:2223/tcp"   # Telnet honeypot
+    networks:
+      honeypot_net:
+        ipv4_address: 172.20.0.10
+    restart: unless-stopped
+
+  # ==========================================
+  # DIONAEA - Multi-Protocol Honeypot
+  # (HTTP, FTP, SMTP, MySQL, SMB, etc.)
+  # ==========================================
+  dionaea:
+    image: dinotools/dionaea:latest
+    container_name: dionaea
+    hostname: web-server-01
+    mem_limit: 1g
+    cpus: 1.0
+    volumes:
+      - ./t-pot/dionaea_config.yaml:/opt/dionaea/etc/dionaea/dionaea.cfg:ro
+      - dionaea_logs:/var/log/dionaea
+      - dionaea_binaries:/opt/dionaea/var/dionaea/binaries
+    ports:
+      - "21:21/tcp"       # FTP
+      - "80:80/tcp"       # HTTP
+      - "443:443/tcp"     # HTTPS
+      - "445:445/tcp"     # SMB
+      - "3306:3306/tcp"   # MySQL
+      - "1433:1433/tcp"   # MSSQL
+      - "5060:5060/udp"   # SIP
+    networks:
+      honeypot_net:
+        ipv4_address: 172.20.0.11
+    restart: unless-stopped
+
+  # ==========================================
+  # ELASTICHONEY - Elasticsearch Honeypot
+  # ==========================================
+  elastichoney:
+    image: jordan/elastichoney:latest
+    container_name: elastichoney
+    hostname: elasticsearch-node
+    mem_limit: 512m
+    cpus: 0.5
+    environment:
+      - LOGSTASH_HOST=logstash
+      - LOGSTASH_PORT=5044
+    ports:
+      - "9201:9200/tcp"   # Fake Elasticsearch
+    networks:
+      honeypot_net:
+        ipv4_address: 172.20.0.12
+    restart: unless-stopped
+
+  # ==========================================
+  # SURICATA - Network IDS
+  # ==========================================
+  suricata:
+    image: jasonish/suricata:latest
+    container_name: suricata
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+      - SYS_NICE
+      - NET_RAW
+    mem_limit: 2g
+    cpus: 2.0
+    volumes:
+      - ./t-pot/suricata_rules.yaml:/etc/suricata/suricata.yaml:ro
+      - suricata_logs:/var/log/suricata
+    command: -i eth0 -v
+    restart: unless-stopped
+
+  # ==========================================
+  # REDIS - Session Storage (Optional)
+  # ==========================================
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    mem_limit: 512m
+    cpus: 0.5
+    ports:
+      - "6379:6379"
+    networks:
+      - elk_net
+    restart: unless-stopped
+
+  # ==========================================
+  # T-POT MANAGEMENT INTERFACE (Web UI)
+  # ==========================================
+  tpot:
+    image: telekom-security/tpotce:latest
+    container_name: tpot
+    hostname: tpot-admin
+    mem_limit: 1g
+    cpus: 1.0
+    environment:
+      - TPOT_PERSISTENCE=TRUE
+    ports:
+      - "64295:64295/tcp"  # T-Pot web interface
+      - "64297:64297/tcp"  # T-Pot SSH admin
+    networks:
+      - honeypot_net
+      - elk_net
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+    depends_on:
+      - cowrie
+      - dionaea
+      - elasticsearch
+
+  # ==========================================
+  # MALWARE ANALYZER (Optional - ClamAV)
+  # ==========================================
+  clamav:
+    image: clamav/clamav:latest
+    container_name: clamav
+    mem_limit: 2g
+    cpus: 1.0
+    volumes:
+      - cowrie_downloads:/scan/cowrie:ro
+      - dionaea_binaries:/scan/dionaea:ro
+    networks:
+      - elk_net
+    restart: unless-stopped
+
+# ==========================================
+# DEPLOYMENT NOTES
+# ==========================================
+# 1. Resource Requirements:
+#    - Min: 16GB RAM, 4 CPU cores, 100GB disk
+#    - Recommended: 32GB RAM, 8 CPU cores, 500GB SSD
+#
+# 2. Network Exposure:
+#    - Expose only honeypot ports to internet
+#    - Keep ELK stack on private network
+#    - Use firewall rules to restrict admin access
+#
+# 3. Data Persistence:
+#    - All logs stored in Docker volumes
+#    - Malware samples in dedicated volumes
+#    - Elasticsearch data persisted
+#
+# 4. Security Considerations:
+#    - Honeypots are isolated on separate network
+#    - No production credentials used
+#    - Monitor resource usage to prevent DoS
+#    - Regular backup of Elasticsearch indices
+#
+# 5. Monitoring:
+#    - Kibana: http://localhost:5601
+#    - Elasticsearch: http://localhost:9200
+#    - T-Pot Admin: https://localhost:64295
+#
+# 6. Log Locations:
+#    - Cowrie: /var/log/cowrie/cowrie.json
+#    - Dionaea: /var/log/dionaea/
+#    - Suricata: /var/log/suricata/eve.json

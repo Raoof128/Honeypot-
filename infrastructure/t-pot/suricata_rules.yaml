@@ -1,0 +1,343 @@
+# Suricata IDS Configuration
+# Network-layer intrusion detection for honeypot traffic analysis
+# Version: 7.0.0
+
+%YAML 1.1
+---
+
+# ==========================================
+# Network Interface Configuration
+# ==========================================
+vars:
+  address-groups:
+    HOME_NET: "[172.20.0.0/24]"  # Honeypot network
+    EXTERNAL_NET: "!$HOME_NET"
+
+    HTTP_SERVERS: "$HOME_NET"
+    SMTP_SERVERS: "$HOME_NET"
+    SQL_SERVERS: "$HOME_NET"
+    DNS_SERVERS: "$HOME_NET"
+    TELNET_SERVERS: "$HOME_NET"
+    SSH_SERVERS: "$HOME_NET"
+    FTP_SERVERS: "$HOME_NET"
+    SMB_SERVERS: "$HOME_NET"
+
+  port-groups:
+    HTTP_PORTS: "80,443,8080,8443"
+    SHELLCODE_PORTS: "!80"
+    ORACLE_PORTS: 1521
+    SSH_PORTS: "[22,2222]"
+    FTP_PORTS: 21
+    SMTP_PORTS: "[25,587,465]"
+    SQL_PORTS: "[1433,3306,5432]"
+
+# ==========================================
+# Output Configuration
+# ==========================================
+outputs:
+  # EVE JSON (primary output)
+  - eve-log:
+      enabled: yes
+      filetype: regular
+      filename: /var/log/suricata/eve.json
+
+      types:
+        - alert:
+            # Include metadata
+            payload: yes
+            payload-buffer-size: 4kb
+            payload-printable: yes
+            packet: yes
+            metadata: yes
+            tagged-packets: yes
+
+        - anomaly:
+            enabled: yes
+
+        - http:
+            enabled: yes
+            extended: yes
+
+        - dns:
+            enabled: yes
+            query: yes
+            answer: yes
+
+        - tls:
+            enabled: yes
+            extended: yes
+
+        - files:
+            enabled: yes
+            force-magic: yes
+            force-hash: [md5, sha256]
+
+        - ssh:
+            enabled: yes
+
+        - smtp:
+            enabled: yes
+            extended: yes
+
+        - ftp:
+            enabled: yes
+
+        - smb:
+            enabled: yes
+
+        - flow:
+            enabled: yes
+
+        - netflow:
+            enabled: no
+
+  # Unified2 output (for Barnyard2 integration)
+  - unified2-alert:
+      enabled: no
+      filename: unified2.alert
+
+  # Stats logging
+  - stats:
+      enabled: yes
+      filename: /var/log/suricata/stats.log
+      interval: 60
+
+# ==========================================
+# Logging Configuration
+# ==========================================
+logging:
+  default-log-level: info
+
+  outputs:
+    - console:
+        enabled: yes
+
+    - file:
+        enabled: yes
+        level: info
+        filename: /var/log/suricata/suricata.log
+
+    - syslog:
+        enabled: no
+        facility: local5
+        format: "[%i] <%d> -- "
+
+# ==========================================
+# Application Layer Parsers
+# ==========================================
+app-layer:
+  protocols:
+    # HTTP parsing
+    http:
+      enabled: yes
+      memcap: 64mb
+
+    # FTP parsing
+    ftp:
+      enabled: yes
+      memcap: 64mb
+
+    # SSH parsing
+    ssh:
+      enabled: yes
+
+    # TLS parsing
+    tls:
+      enabled: yes
+      detection-ports:
+        dp: 443
+
+    # SMB parsing
+    smb:
+      enabled: yes
+      detection-ports:
+        dp: 139,445
+
+    # DNS parsing
+    dns:
+      tcp:
+        enabled: yes
+        detection-ports:
+          dp: 53
+      udp:
+        enabled: yes
+        detection-ports:
+          dp: 53
+
+    # SMTP parsing
+    smtp:
+      enabled: yes
+      raw-extraction: no
+      mime:
+        decode-mime: yes
+        decode-base64: yes
+        decode-quoted-printable: yes
+        header-value-depth: 2000
+        extract-urls: yes
+        body-md5: yes
+
+    # MySQL parsing
+    mysql:
+      enabled: yes
+
+    # RDP parsing
+    rdp:
+      enabled: yes
+
+# ==========================================
+# Detection Engine
+# ==========================================
+detect:
+  profile: medium
+  custom-values:
+    toclient-groups: 3
+    toserver-groups: 25
+
+  sgh-mpm-context: auto
+  inspection-recursion-limit: 3000
+
+# ==========================================
+# Rule Files
+# ==========================================
+default-rule-path: /var/lib/suricata/rules
+
+rule-files:
+  - suricata.rules
+  - emerging-attack_response.rules
+  - emerging-malware.rules
+  - emerging-botcc.rules
+  - emerging-exploit.rules
+  - emerging-scan.rules
+  - emerging-shellcode.rules
+  - emerging-trojan.rules
+  - emerging-worm.rules
+  - emerging-web_server.rules
+  - emerging-web_client.rules
+  - emerging-sql.rules
+  - emerging-ftp.rules
+  - emerging-ssh.rules
+  - emerging-smtp.rules
+
+# Custom honeypot rules
+classification-file: /var/lib/suricata/rules/classification.config
+reference-config-file: /var/lib/suricata/rules/reference.config
+
+# ==========================================
+# Performance Tuning
+# ==========================================
+threading:
+  set-cpu-affinity: no
+  cpu-affinity:
+    - management-cpu-set:
+        cpu: [ 0 ]
+    - receive-cpu-set:
+        cpu: [ 0 ]
+    - worker-cpu-set:
+        cpu: [ "all" ]
+        mode: "exclusive"
+        prio:
+          default: "medium"
+
+# Capture method
+af-packet:
+  - interface: eth0
+    cluster-id: 99
+    cluster-type: cluster_flow
+    defrag: yes
+    use-mmap: yes
+    ring-size: 2048
+    block-size: 32768
+
+# Memory limits
+stream:
+  memcap: 256mb
+  checksum-validation: yes
+  inline: auto
+  reassembly:
+    memcap: 512mb
+    depth: 1mb
+    toserver-chunk-size: 2560
+    toclient-chunk-size: 2560
+
+# Flow tracking
+flow:
+  memcap: 256mb
+  hash-size: 65536
+  prealloc: 10000
+
+# Defrag
+defrag:
+  memcap: 256mb
+  hash-size: 65536
+  trackers: 65535
+  max-frags: 65535
+  prealloc: yes
+  timeout: 60
+
+# ==========================================
+# Alert Threshold
+# ==========================================
+# Suppress noisy alerts
+threshold:
+  threshold-file: /etc/suricata/threshold.config
+
+# ==========================================
+# Custom Honeypot Rules
+# ==========================================
+# Add custom rules to detect honeypot-specific activity:
+# - SSH brute force (high frequency login attempts)
+# - Port scanning detection
+# - Malware download attempts
+# - Shellcode execution attempts
+# - C2 beacon traffic
+# - Cryptocurrency mining connections
+
+# Example rules (add to /var/lib/suricata/rules/honeypot.rules):
+#
+# alert ssh any any -> $HOME_NET $SSH_PORTS (msg:"HONEYPOT SSH Brute Force Attempt"; flow:to_server; ssh.protoversion:2.0; threshold:type threshold, track by_src, count 10, seconds 60; classtype:attempted-recon; sid:1000001; rev:1;)
+#
+# alert tcp any any -> $HOME_NET any (msg:"HONEYPOT Port Scan Detected"; flags:S; threshold:type threshold, track by_src, count 20, seconds 10; classtype:attempted-recon; sid:1000002; rev:1;)
+#
+# alert http any any -> $HOME_NET $HTTP_PORTS (msg:"HONEYPOT Malware Download Attempt"; flow:established,to_server; content:".exe"; http_uri; nocase; classtype:trojan-activity; sid:1000003; rev:1;)
+#
+# alert tcp $HOME_NET any -> $EXTERNAL_NET any (msg:"HONEYPOT Outbound Connection - Possible Compromise"; flow:to_server,established; threshold:type threshold, track by_src, count 1, seconds 60; classtype:bad-unknown; sid:1000004; rev:1;)
+#
+# alert tcp any any -> $HOME_NET 3306 (msg:"HONEYPOT MySQL Brute Force"; flow:to_server,established; content:"|00 00 00|"; depth:3; threshold:type threshold, track by_src, count 10, seconds 60; classtype:attempted-user; sid:1000005; rev:1;)
+
+# ==========================================
+# MITRE ATT&CK Mapping
+# ==========================================
+# Suricata alerts mapped to MITRE ATT&CK:
+# - T1046: Network Service Scanning (port scans)
+# - T1110: Brute Force (SSH, MySQL, FTP)
+# - T1071: Application Layer Protocol (C2 beacons)
+# - T1105: Ingress Tool Transfer (malware downloads)
+# - T1059: Command and Scripting Interpreter (shellcode)
+# - T1190: Exploit Public-Facing Application (web exploits)
+
+# ==========================================
+# DEPLOYMENT NOTES
+# ==========================================
+# 1. Install Suricata:
+#    sudo apt-get install suricata
+#    sudo suricata-update
+#
+# 2. Update rules daily:
+#    0 2 * * * /usr/bin/suricata-update
+#
+# 3. Monitor performance:
+#    - Check /var/log/suricata/stats.log
+#    - Tune memcap if drops occur
+#    - Adjust threading for CPU count
+#
+# 4. Integration with ELK:
+#    - Logstash parses /var/log/suricata/eve.json
+#    - Alerts indexed to Elasticsearch
+#    - Kibana dashboards visualize IDS events
+#
+# 5. Expected alert volume:
+#    - 100-1000 alerts/day on active honeypot
+#    - Port scans: 40-60% of alerts
+#    - Brute force: 20-30% of alerts
+#    - Malware downloads: 5-10% of alerts
+#    - Other exploits: 5-10% of alerts

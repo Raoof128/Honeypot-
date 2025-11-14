@@ -1,0 +1,78 @@
+name: Weekly Threat Intelligence Report
+
+on:
+  # Run every Monday at 2 AM UTC
+  schedule:
+    - cron: '0 2 * * 1'
+
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      days:
+        description: 'Number of days to analyze'
+        required: false
+        default: '7'
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          pip install elasticsearch geoip2 jq
+
+      - name: Download GeoIP databases
+        run: |
+          mkdir -p infrastructure/elk-stack/geoip
+          # Note: You'll need to add GeoLite2 databases as secrets or download via API
+          # For now, this is a placeholder
+          echo "GeoIP database download would happen here"
+
+      - name: Generate threat intelligence report
+        env:
+          ES_HOST: ${{ secrets.ELASTICSEARCH_HOST }}
+          ES_PORT: ${{ secrets.ELASTICSEARCH_PORT }}
+        run: |
+          DAYS=${{ github.event.inputs.days || '7' }}
+          ./scripts/generate_report.sh --days $DAYS --output-dir reports/automated
+
+      - name: Upload report artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: threat-intelligence-report
+          path: reports/automated/
+          retention-days: 90
+
+      - name: Create GitHub Issue with Summary
+        uses: peter-evans/create-issue-from-file@v4
+        with:
+          title: "Weekly Threat Intelligence Report - Week ${{ github.run_number }}"
+          content-filepath: reports/automated/executive_report_*.md
+          labels: threat-intelligence, automated-report
+
+      - name: Notify Slack (optional)
+        if: success()
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+            --data '{"text":"Weekly threat intelligence report generated successfully! Check GitHub Actions artifacts."}' \
+            $SLACK_WEBHOOK
+
+      - name: Commit reports to repository
+        if: success()
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add reports/automated/
+          git commit -m "chore: automated weekly threat intelligence report" || echo "No changes to commit"
+          git push
