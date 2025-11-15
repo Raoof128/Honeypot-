@@ -1,0 +1,388 @@
+{
+  "metadata": {
+    "analysis_time": "2024-01-22T14:30:00.000Z",
+    "time_range_start": "2024-01-15T00:00:00.000Z",
+    "time_range_end": "2024-01-22T00:00:00.000Z",
+    "days_analyzed": 7,
+    "total_unique_ips": 247,
+    "total_attack_sessions": 1834,
+    "analysis_type": "geographic_distribution"
+  },
+  "countries": {
+    "China": {
+      "total_ips": 89,
+      "total_sessions": 672,
+      "percentage": 36.6,
+      "threat_level": "high",
+      "top_cities": [
+        {
+          "city": "Beijing",
+          "ips": 34,
+          "sessions": 287,
+          "coordinates": {
+            "latitude": 39.9042,
+            "longitude": 116.4074
+          }
+        },
+        {
+          "city": "Shanghai",
+          "ips": 28,
+          "sessions": 215,
+          "coordinates": {
+            "latitude": 31.2304,
+            "longitude": 121.4737
+          }
+        },
+        {
+          "city": "Guangzhou",
+          "ips": 15,
+          "sessions": 108,
+          "coordinates": {
+            "latitude": 23.1291,
+            "longitude": 113.2644
+          }
+        }
+      ],
+      "top_asns": [
+        {
+          "asn": "AS4134",
+          "name": "Chinanet",
+          "ips": 45,
+          "sessions": 334
+        },
+        {
+          "asn": "AS4837",
+          "name": "China Unicom",
+          "ips": 23,
+          "sessions": 189
+        }
+      ]
+    },
+    "United States": {
+      "total_ips": 52,
+      "total_sessions": 398,
+      "percentage": 21.7,
+      "threat_level": "medium",
+      "top_cities": [
+        {
+          "city": "New York",
+          "ips": 12,
+          "sessions": 87,
+          "coordinates": {
+            "latitude": 40.7128,
+            "longitude": -74.0060
+          }
+        },
+        {
+          "city": "Los Angeles",
+          "ips": 10,
+          "sessions": 76,
+          "coordinates": {
+            "latitude": 34.0522,
+            "longitude": -118.2437
+          }
+        },
+        {
+          "city": "Dallas",
+          "ips": 8,
+          "sessions": 65,
+          "coordinates": {
+            "latitude": 32.7767,
+            "longitude": -96.7970
+          }
+        }
+      ],
+      "top_asns": [
+        {
+          "asn": "AS15169",
+          "name": "Google LLC",
+          "ips": 18,
+          "sessions": 134
+        },
+        {
+          "asn": "AS16509",
+          "name": "Amazon.com",
+          "ips": 15,
+          "sessions": 112
+        }
+      ]
+    },
+    "Russia": {
+      "total_ips": 38,
+      "total_sessions": 289,
+      "percentage": 15.8,
+      "threat_level": "high",
+      "top_cities": [
+        {
+          "city": "Moscow",
+          "ips": 22,
+          "sessions": 167,
+          "coordinates": {
+            "latitude": 55.7558,
+            "longitude": 37.6173
+          }
+        },
+        {
+          "city": "Saint Petersburg",
+          "ips": 9,
+          "sessions": 78,
+          "coordinates": {
+            "latitude": 59.9343,
+            "longitude": 30.3351
+          }
+        }
+      ],
+      "top_asns": [
+        {
+          "asn": "AS12389",
+          "name": "Rostelecom",
+          "ips": 28,
+          "sessions": 198
+        }
+      ]
+    },
+    "India": {
+      "total_ips": 24,
+      "total_sessions": 156,
+      "percentage": 8.5,
+      "threat_level": "medium",
+      "top_cities": [
+        {
+          "city": "Mumbai",
+          "ips": 10,
+          "sessions": 67,
+          "coordinates": {
+            "latitude": 19.0760,
+            "longitude": 72.8777
+          }
+        },
+        {
+          "city": "Bangalore",
+          "ips": 8,
+          "sessions": 54,
+          "coordinates": {
+            "latitude": 12.9716,
+            "longitude": 77.5946
+          }
+        }
+      ],
+      "top_asns": [
+        {
+          "asn": "AS9829",
+          "name": "BSNL",
+          "ips": 15,
+          "sessions": 89
+        }
+      ]
+    },
+    "Brazil": {
+      "total_ips": 18,
+      "total_sessions": 134,
+      "percentage": 7.3,
+      "threat_level": "medium",
+      "top_cities": [
+        {
+          "city": "São Paulo",
+          "ips": 12,
+          "sessions": 89,
+          "coordinates": {
+            "latitude": -23.5505,
+            "longitude": -46.6333
+          }
+        }
+      ],
+      "top_asns": [
+        {
+          "asn": "AS28573",
+          "name": "Claro",
+          "ips": 12,
+          "sessions": 87
+        }
+      ]
+    },
+    "Germany": {
+      "total_ips": 15,
+      "total_sessions": 98,
+      "percentage": 5.3,
+      "threat_level": "low",
+      "top_cities": [
+        {
+          "city": "Frankfurt",
+          "ips": 8,
+          "sessions": 56,
+          "coordinates": {
+            "latitude": 50.1109,
+            "longitude": 8.6821
+          }
+        }
+      ],
+      "top_asns": [
+        {
+          "asn": "AS24940",
+          "name": "Hetzner",
+          "ips": 10,
+          "sessions": 67
+        }
+      ]
+    },
+    "Netherlands": {
+      "total_ips": 11,
+      "total_sessions": 87,
+      "percentage": 4.7,
+      "threat_level": "low",
+      "top_cities": [
+        {
+          "city": "Amsterdam",
+          "ips": 9,
+          "sessions": 72,
+          "coordinates": {
+            "latitude": 52.3676,
+            "longitude": 4.9041
+          }
+        }
+      ],
+      "top_asns": [
+        {
+          "asn": "AS16276",
+          "name": "OVH SAS",
+          "ips": 7,
+          "sessions": 54
+        }
+      ]
+    }
+  },
+  "attack_corridors": [
+    {
+      "name": "East Asia Corridor",
+      "countries": ["China", "South Korea", "Japan"],
+      "total_ips": 112,
+      "total_sessions": 823,
+      "primary_targets": ["SSH", "HTTP", "Telnet"],
+      "threat_level": "critical"
+    },
+    {
+      "name": "Eastern Europe Corridor",
+      "countries": ["Russia", "Ukraine", "Romania"],
+      "total_ips": 54,
+      "total_sessions": 387,
+      "primary_targets": ["SSH", "SMB", "MySQL"],
+      "threat_level": "high"
+    },
+    {
+      "name": "North America Corridor",
+      "countries": ["United States", "Canada"],
+      "total_ips": 58,
+      "total_sessions": 423,
+      "primary_targets": ["HTTP", "HTTPS", "Elasticsearch"],
+      "threat_level": "medium"
+    },
+    {
+      "name": "South America Corridor",
+      "countries": ["Brazil", "Argentina", "Colombia"],
+      "total_ips": 27,
+      "total_sessions": 189,
+      "primary_targets": ["SSH", "FTP"],
+      "threat_level": "medium"
+    }
+  ],
+  "temporal_patterns": {
+    "peak_attack_hours_utc": [
+      {"hour": 2, "sessions": 156},
+      {"hour": 14, "sessions": 143},
+      {"hour": 8, "sessions": 128}
+    ],
+    "daily_distribution": {
+      "weekday_average": 265,
+      "weekend_average": 189,
+      "peak_day": "Wednesday",
+      "lowest_day": "Sunday"
+    }
+  },
+  "protocol_distribution_by_region": {
+    "China": {
+      "SSH": 67.3,
+      "Telnet": 18.5,
+      "HTTP": 10.2,
+      "FTP": 4.0
+    },
+    "United States": {
+      "HTTP": 45.2,
+      "HTTPS": 28.7,
+      "SSH": 15.3,
+      "Elasticsearch": 10.8
+    },
+    "Russia": {
+      "SSH": 52.1,
+      "SMB": 23.4,
+      "MySQL": 15.6,
+      "HTTP": 8.9
+    }
+  },
+  "heat_map_data": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [116.4074, 39.9042]
+        },
+        "properties": {
+          "city": "Beijing, China",
+          "intensity": 287,
+          "threat_score": 85
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [121.4737, 31.2304]
+        },
+        "properties": {
+          "city": "Shanghai, China",
+          "intensity": 215,
+          "threat_score": 78
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [37.6173, 55.7558]
+        },
+        "properties": {
+          "city": "Moscow, Russia",
+          "intensity": 167,
+          "threat_score": 72
+        }
+      },
+      {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-74.0060, 40.7128]
+        },
+        "properties": {
+          "city": "New York, USA",
+          "intensity": 87,
+          "threat_score": 45
+        }
+      }
+    ]
+  },
+  "insights": {
+    "primary_finding": "East Asia (primarily China) accounts for 36.6% of all attack traffic, with Beijing and Shanghai as major attack origins.",
+    "emerging_threats": [
+      "Increased SSH brute force activity from Chinese IP ranges (AS4134)",
+      "Growing SMB exploitation attempts from Russian networks",
+      "Cloud provider IPs (AWS, Google Cloud) used for reconnaissance"
+    ],
+    "recommendations": [
+      "Implement geo-blocking for high-risk ASNs (AS4134, AS4837, AS12389)",
+      "Deploy rate limiting on SSH ports from East Asian IP ranges",
+      "Monitor cloud provider IPs for anomalous scanning behavior",
+      "Enhance logging for SMB protocol from Eastern European sources"
+    ]
+  }
+}

